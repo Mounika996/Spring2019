@@ -7,15 +7,26 @@ const model = {
         });    
     },
     get(id, cb){
+        conn.query("SELECT * From spring2019inclass_persons WHERE Id=?",id, (err,data) => {
+         cb(err,data[0]);
+        });
 
     },
     add(input, cb){
+        if(!input.password.length < 8){
+            cb(Error('A longer password is required'));
+            return;
+        }
         conn.query( "INSERT INTO 2019Spring_Persons (FirstName,LastName,Birthday,Password,created_at) VALUES (?)",
                     [[input.FirstName, input.LastName, input.Birthday, input.Password, new Date()]],
                     (err, data) => {
+                        if(err){
+                            cb(err);
+                            return;
+                        }
+                        model.get(data.insertId,(err,data)=>{
                         cb(err, data);
-                    }
-        );    
+                    })   
     }
 };
 
